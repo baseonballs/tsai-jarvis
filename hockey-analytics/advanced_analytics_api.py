@@ -568,16 +568,16 @@ class StatisticalAnalysisService:
                     series = df[var].dropna()
                     results[var] = {
                         "count": len(series),
-                        "mean": float(series.mean()) if len(series) > 0 else 0,
-                        "median": float(series.median()) if len(series) > 0 else 0,
-                        "mode": float(series.mode().iloc[0]) if len(series.mode()) > 0 else 0,
-                        "std": float(series.std()) if len(series) > 0 else 0,
-                        "var": float(series.var()) if len(series) > 0 else 0,
+                        "mean": float(series.mean()) if len(series) > 0 and not pd.isna(series.mean()) else 0,
+                        "median": float(series.median()) if len(series) > 0 and not pd.isna(series.median()) else 0,
+                        "mode": float(series.mode().iloc[0]) if len(series.mode()) > 0 and not pd.isna(series.mode().iloc[0]) else 0,
+                        "std": float(series.std()) if len(series) > 0 and not pd.isna(series.std()) else 0,
+                        "var": float(series.var()) if len(series) > 0 and not pd.isna(series.var()) else 0,
                         "min": float(series.min()) if len(series) > 0 else 0,
                         "max": float(series.max()) if len(series) > 0 else 0,
                         "range": float(series.max() - series.min()) if len(series) > 0 else 0,
-                        "skewness": float(series.skew()) if len(series) > 0 else 0,
-                        "kurtosis": float(series.kurtosis()) if len(series) > 0 else 0,
+                        "skewness": float(series.skew()) if len(series) > 0 and not pd.isna(series.skew()) else 0,
+                        "kurtosis": float(series.kurtosis()) if len(series) > 0 and not pd.isna(series.kurtosis()) else 0,
                         "quartiles": {
                             "q1": float(series.quantile(0.25)) if len(series) > 0 else 0,
                             "q2": float(series.quantile(0.5)) if len(series) > 0 else 0,
@@ -679,13 +679,13 @@ class StatisticalAnalysisService:
                 if len(series) > 0:
                     results[var] = {
                         "count": len(series),
-                        "mean": float(series.mean()),
-                        "std": float(series.std()),
+                        "mean": float(series.mean()) if not pd.isna(series.mean()) else 0.0,
+                        "std": float(series.std()) if not pd.isna(series.std()) else 0.0,
                         "min": float(series.min()),
                         "max": float(series.max()),
                         "median": float(series.median()),
-                        "skewness": float(series.skew()),
-                        "kurtosis": float(series.kurtosis())
+                        "skewness": float(series.skew()) if not pd.isna(series.skew()) else 0.0,
+                        "kurtosis": float(series.kurtosis()) if not pd.isna(series.kurtosis()) else 0.0
                     }
         
         return {
