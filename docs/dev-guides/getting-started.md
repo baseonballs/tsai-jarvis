@@ -56,7 +56,7 @@ pip install -r requirements.txt
 cd dashboard
 
 # Install dependencies
-npm install
+pnpm install
 
 # Return to project root
 cd ..
