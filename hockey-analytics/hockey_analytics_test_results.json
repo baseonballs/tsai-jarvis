@@ -1,0 +1,98 @@
+{
+  "test_suite": "Hockey Analytics Phase 1.1",
+  "timestamp": 1761371510.271348,
+  "results": {
+    "test_yolo_model_loading": {
+      "status": "passed",
+      "result": {
+        "models_available": 4,
+        "model_loaded": "yolov8n",
+        "model_info": {
+          "model_id": "yolov8n",
+          "registry_info": {
+            "name": "YOLOv8 Nano",
+            "size": "nano",
+            "speed": "fastest",
+            "accuracy": "good",
+            "description": "Lightweight model for real-time processing"
+          },
+          "file_exists": true,
+          "file_size": 6549796,
+          "versions": [
+            {
+              "model_id": "yolov8n",
+              "version": "1.0.0",
+              "download_date": "2025-10-24T22:51:49.413748",
+              "file_size": 6549796,
+              "checksum": "95a2449609c73cd69a072b09daaff0cc"
+            }
+          ],
+          "performance": {},
+          "is_active": true
+        }
+      },
+      "timestamp": 1761371509.44486
+    },
+    "test_video_processing": {
+      "status": "passed",
+      "result": {
+        "processor_initialized": true,
+        "frame_processing": "success",
+        "player_tracking": "success",
+        "event_detection": "success"
+      },
+      "timestamp": 1761371509.535933
+    },
+    "test_player_detection": {
+      "status": "passed",
+      "result": {
+        "total_frames_tested": 10,
+        "total_detections": 0,
+        "detection_accuracy": "0.0%",
+        "average_detections_per_frame": 0.0
+      },
+      "timestamp": 1761371510.0214589
+    },
+    "test_game_event_detection": {
+      "status": "passed",
+      "result": {
+        "players_tested": 3,
+        "events_detected": 1,
+        "faceoff_events": 1,
+        "event_types": [
+          "faceoff"
+        ]
+      },
+      "timestamp": 1761371510.02156
+    },
+    "test_video_streaming": {
+      "status": "passed",
+      "result": {
+        "streamer_initialized": true,
+        "status_check": "passed",
+        "mock_analytics": "configured"
+      },
+      "timestamp": 1761371510.021603
+    },
+    "test_performance_benchmarks": {
+      "status": "passed",
+      "result": {
+        "benchmark_completed": true,
+        "fps": 20.7114054588424,
+        "avg_inference_time": 0.0482825756072998,
+        "performance_ok": true,
+        "thresholds": {
+          "min_fps": 10,
+          "max_inference_time": 0.1
+        }
+      },
+      "timestamp": 1761371510.271283
+    }
+  },
+  "summary": {
+    "total_tests": 6,
+    "passed": 6,
+    "failed": 0,
+    "success_rate": "100.0%"
+  }
+}
