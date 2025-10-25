@@ -29,6 +29,8 @@ This roadmap outlines the next development phases for the TSAI Jarvis Core Intel
 - **Player Detection & Tracking**: Advanced computer vision for hockey players
 - **Event Detection**: Automated detection of goals, saves, penalties, and key events
 - **Performance Analytics**: Player speed, distance, shot accuracy, and team formations
+- **Image Analysis & Computer Vision**: Advanced image processing, object detection, and highlighting capabilities
+- **Target Detection & Highlighting**: Real-time detection and annotation of key objects and events in images/video
 
 #### **Phase 1.1: Video Processing Pipeline (Week 1-2)**
 
@@ -56,6 +58,35 @@ This roadmap outlines the next development phases for the TSAI Jarvis Core Intel
   - [ ] Video stabilization and enhancement
   - [ ] Resolution standardization
   - [ ] Color space optimization
+
+**Image Analysis & Computer Vision:**
+- [ ] **Advanced Image Processing**
+  - [ ] Real-time image enhancement and filtering
+  - [ ] Noise reduction and image denoising
+  - [ ] Contrast and brightness optimization
+  - [ ] Image sharpening and edge detection
+  - [ ] Color space conversion and optimization
+
+- [ ] **Object Detection & Recognition**
+  - [ ] Multi-class object detection (players, pucks, goals, equipment)
+  - [ ] Real-time bounding box generation
+  - [ ] Object classification and confidence scoring
+  - [ ] Object tracking across frames
+  - [ ] Pose estimation and keypoint detection
+
+- [ ] **Target Detection & Highlighting**
+  - [ ] Real-time target identification and highlighting
+  - [ ] Custom annotation and markup systems
+  - [ ] Interactive highlighting tools
+  - [ ] Automated region of interest (ROI) detection
+  - [ ] Smart cropping and focus areas
+
+- [ ] **Computer Vision Pipeline**
+  - [ ] Image segmentation and masking
+  - [ ] Feature extraction and matching
+  - [ ] Optical flow and motion analysis
+  - [ ] Stereo vision and depth estimation
+  - [ ] Image registration and alignment
 
 **YOLO Model Integration:**
 - [ ] **YOLO v8 Model Deployment**
@@ -109,6 +140,35 @@ This roadmap outlines the next development phases for the TSAI Jarvis Core Intel
   - [ ] Team formation analysis
   - [ ] Game flow analysis
 
+**Real-time Image Analysis:**
+- [ ] **Live Object Detection**
+  - [ ] Real-time player detection and tracking
+  - [ ] Puck detection and trajectory analysis
+  - [ ] Goal and equipment detection
+  - [ ] Referee and official detection
+  - [ ] Crowd and spectator analysis
+
+- [ ] **Target Highlighting System**
+  - [ ] Real-time bounding box generation
+  - [ ] Dynamic highlighting of key objects
+  - [ ] Custom annotation overlays
+  - [ ] Interactive highlighting controls
+  - [ ] Automated region of interest detection
+
+- [ ] **Image Enhancement Pipeline**
+  - [ ] Real-time image quality optimization
+  - [ ] Dynamic contrast and brightness adjustment
+  - [ ] Noise reduction and sharpening
+  - [ ] Color space optimization
+  - [ ] Resolution upscaling and enhancement
+
+- [ ] **Computer Vision Analytics**
+  - [ ] Pose estimation and keypoint tracking
+  - [ ] Motion analysis and optical flow
+  - [ ] Image segmentation and masking
+  - [ ] Feature extraction and matching
+  - [ ] Depth estimation and 3D reconstruction
+
 **Analytics Dashboard:**
 - [ ] **Real-time Game Statistics**
   - [ ] Live score and game clock
@@ -133,6 +193,14 @@ This roadmap outlines the next development phases for the TSAI Jarvis Core Intel
   - [ ] Shot trajectory visualizations
   - [ ] Team formation diagrams
   - [ ] Game flow charts
+
+- [ ] **Image Analysis Dashboard**
+  - [ ] Real-time object detection visualization
+  - [ ] Target highlighting and annotation tools
+  - [ ] Image enhancement controls
+  - [ ] Computer vision analytics display
+  - [ ] Interactive image analysis tools
+  - [ ] Custom annotation and markup interface
 
 #### **Phase 1.3: Advanced Analytics (Week 5-6)**
 
@@ -186,6 +254,35 @@ This roadmap outlines the next development phases for the TSAI Jarvis Core Intel
   - [ ] Injury risk assessment
   - [ ] Draft and scouting insights
 
+**Advanced Image Analysis:**
+- [ ] **Deep Learning Computer Vision**
+  - [ ] Advanced object detection models
+  - [ ] Semantic segmentation and instance segmentation
+  - [ ] Pose estimation and human pose analysis
+  - [ ] Action recognition and activity detection
+  - [ ] Scene understanding and context analysis
+
+- [ ] **Image Processing & Enhancement**
+  - [ ] Super-resolution and image upscaling
+  - [ ] Advanced noise reduction algorithms
+  - [ ] Color grading and style transfer
+  - [ ] Image restoration and inpainting
+  - [ ] Multi-spectral image analysis
+
+- [ ] **Target Detection & Annotation**
+  - [ ] Automated target detection
+  - [ ] Smart annotation and labeling
+  - [ ] Custom highlighting algorithms
+  - [ ] Interactive annotation tools
+  - [ ] Automated markup generation
+
+- [ ] **Computer Vision Analytics**
+  - [ ] Optical flow and motion analysis
+  - [ ] Stereo vision and depth estimation
+  - [ ] Image registration and alignment
+  - [ ] Feature matching and tracking
+  - [ ] 3D reconstruction and modeling
+
 #### **Phase 1.4: Production Analytics (Week 7-8)**
 
 **Scalable Processing:**
@@ -212,6 +309,28 @@ This roadmap outlines the next development phases for the TSAI Jarvis Core Intel
   - [ ] Resource utilization optimization
   - [ ] Cost optimization
   - [ ] Scalability improvements
+
+**Production Image Analysis:**
+- [ ] **Scalable Image Processing**
+  - [ ] Distributed image processing pipeline
+  - [ ] GPU cluster optimization for image analysis
+  - [ ] Batch processing for historical images
+  - [ ] Real-time image streaming and processing
+  - [ ] Image caching and CDN integration
+
+- [ ] **Image Analysis APIs**
+  - [ ] RESTful APIs for image processing
+  - [ ] Real-time image analysis endpoints
+  - [ ] Batch image processing APIs
+  - [ ] Custom annotation and highlighting APIs
+  - [ ] Image enhancement and optimization APIs
+
+- [ ] **Image Storage & Management**
+  - [ ] Distributed image storage system
+  - [ ] Image metadata indexing and search
+  - [ ] Image versioning and backup
+  - [ ] Image compression and optimization
+  - [ ] Image security and access control
 
 **API Integration:**
 - [ ] **Analytics API Endpoints**
@@ -241,12 +360,16 @@ This roadmap outlines the next development phases for the TSAI Jarvis Core Intel
 #### **Technical Implementation Details:**
 
 **AI/ML Stack:**
-- **Computer Vision**: YOLO v8, OpenCV, PyTorch
+- **Computer Vision**: YOLO v8, OpenCV, PyTorch, Detectron2
+- **Image Processing**: PIL/Pillow, scikit-image, OpenCV
+- **Object Detection**: YOLO, R-CNN, SSD, RetinaNet
 - **Video Processing**: FFmpeg, GStreamer, OpenCV
 - **Real-time Inference**: TensorRT, ONNX, TorchScript
+- **Image Analysis**: OpenCV, scikit-image, Albumentations
+- **Target Highlighting**: Custom annotation tools, LabelImg, CVAT
 - **Data Pipeline**: Apache Kafka, Redis, PostgreSQL
 - **Analytics**: Pandas, NumPy, Scikit-learn
-- **Visualization**: D3.js, Chart.js, Plotly
+- **Visualization**: D3.js, Chart.js, Plotly, Matplotlib
 
 **Infrastructure Requirements:**
 - **GPU Servers**: NVIDIA RTX 4090 or A100 for inference
@@ -258,11 +381,15 @@ This roadmap outlines the next development phases for the TSAI Jarvis Core Intel
 
 **Success Metrics:**
 - **95% player detection accuracy** on hockey video
+- **90% object detection accuracy** for pucks, goals, and equipment
 - **< 2 second processing latency** for real-time analysis
+- **< 100ms image processing latency** for target highlighting
 - **Real-time analytics dashboard** with live updates
 - **Automated highlight generation** with 90% relevance
+- **Real-time target highlighting** with 95% accuracy
 - **10,000+ concurrent users** supported
 - **99.9% uptime** for live game analysis
+- **Image analysis processing** at 30+ FPS
 
 ---
 
