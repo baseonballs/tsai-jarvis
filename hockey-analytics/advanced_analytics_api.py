@@ -18,6 +18,17 @@ from dataclasses import dataclass, asdict
 from datetime import datetime, timedelta
 from collections import defaultdict, deque
 import websockets
+
+# Helper function to safely convert values to float, handling NaN
+def safe_float(value, default=0.0):
+    """Safely convert value to float, handling NaN and None values"""
+    if pd.isna(value) or value is None:
+        return default
+    try:
+        result = float(value)
+        return result if not pd.isna(result) else default
+    except (ValueError, TypeError):
+        return default
 import aiohttp
 from aiofiles import open as aio_open
 import sqlite3
@@ -203,7 +214,7 @@ class AdvancedAnalyticsEngine:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
         
-        @self.app.get("/api/analytics/statistical/descriptive")
+        @self.app.post("/api/analytics/statistical/descriptive")
         async def get_descriptive_statistics(data: Dict[str, Any]):
             """Get descriptive statistics"""
             try:
@@ -568,20 +579,20 @@ class StatisticalAnalysisService:
                     series = df[var].dropna()
                     results[var] = {
                         "count": len(series),
-                        "mean": float(series.mean()) if len(series) > 0 and not pd.isna(series.mean()) else 0,
-                        "median": float(series.median()) if len(series) > 0 and not pd.isna(series.median()) else 0,
-                        "mode": float(series.mode().iloc[0]) if len(series.mode()) > 0 and not pd.isna(series.mode().iloc[0]) else 0,
-                        "std": float(series.std()) if len(series) > 0 and not pd.isna(series.std()) else 0,
-                        "var": float(series.var()) if len(series) > 0 and not pd.isna(series.var()) else 0,
+                        "mean": safe_float(series.mean()),
+                        "median": safe_float(series.median()),
+                        "mode": safe_float(series.mode().iloc[0]) if len(series.mode()) > 0 else 0,
+                        "std": safe_float(series.std()),
+                        "var": safe_float(series.var()),
                         "min": float(series.min()) if len(series) > 0 else 0,
                         "max": float(series.max()) if len(series) > 0 else 0,
                         "range": float(series.max() - series.min()) if len(series) > 0 else 0,
-                        "skewness": float(series.skew()) if len(series) > 0 and not pd.isna(series.skew()) else 0,
-                        "kurtosis": float(series.kurtosis()) if len(series) > 0 and not pd.isna(series.kurtosis()) else 0,
+                        "skewness": safe_float(series.skew()),
+                        "kurtosis": safe_float(series.kurtosis()),
                         "quartiles": {
-                            "q1": float(series.quantile(0.25)) if len(series) > 0 else 0,
-                            "q2": float(series.quantile(0.5)) if len(series) > 0 else 0,
-                            "q3": float(series.quantile(0.75)) if len(series) > 0 else 0
+                            "q1": safe_float(series.quantile(0.25)),
+                            "q2": safe_float(series.quantile(0.5)),
+                            "q3": safe_float(series.quantile(0.75))
                         }
                     }
             
@@ -679,13 +690,13 @@ class StatisticalAnalysisService:
                 if len(series) > 0:
                     results[var] = {
                         "count": len(series),
-                        "mean": float(series.mean()) if not pd.isna(series.mean()) else 0.0,
-                        "std": float(series.std()) if not pd.isna(series.std()) else 0.0,
+                        "mean": safe_float(series.mean()),
+                        "std": safe_float(series.std()),
                         "min": float(series.min()),
                         "max": float(series.max()),
                         "median": float(series.median()),
-                        "skewness": float(series.skew()) if not pd.isna(series.skew()) else 0.0,
-                        "kurtosis": float(series.kurtosis()) if not pd.isna(series.kurtosis()) else 0.0
+                        "skewness": safe_float(series.skew()),
+                        "kurtosis": safe_float(series.kurtosis())
                     }
         
         return {

@@ -33,12 +33,13 @@ TSAI Jarvis has been assigned the **8000-8099** port range to avoid conflicts wi
 | **Machine Learning** | 8009 | http://localhost:8009 | Phase 2.5: ML API | ✅ **Active** |
 | **Enterprise Security** | 8010 | http://localhost:8010 | Phase 2.6: Security API | ✅ **Active** |
 | **Advanced Analytics** | 8011 | http://localhost:8011 | Phase 2.7: Analytics API | ✅ **Active** |
+| **Image Analysis** | 8012 | http://localhost:8012 | Phase 2.8: Image Analysis API | ✅ **Active** |
 
 ### Reserved Ports
 | Port Range | Purpose | Status |
 |------------|---------|--------|
 | 8005-8006 | Future Phase 2.x services | 🔒 **Reserved** |
-| 8012-8099 | Future TSAI Jarvis services | 🔒 **Reserved** |
+| 8013-8099 | Future TSAI Jarvis services | 🔒 **Reserved** |
 
 ## TSAI Ecosystem Port Conflicts Analysis
 

@@ -45,7 +45,7 @@ class GameState(BaseModel):
     away_score: int
     period: int
     time_remaining: str
-    power_play: Dict[str, any]
+    power_play: Dict[str, Any]
 
 class PlayerStats(BaseModel):
     player_id: int
