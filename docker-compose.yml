@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  # Temporal AI Infrastructure
+  temporal:
+    image: temporalio/auto-setup:latest
+    ports:
+      - "7233:7233"
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=postgresql
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+    volumes:
+      - ./config/temporal:/etc/temporal/config/dynamicconfig
+    depends_on:
+      - postgresql
+    networks:
+      - jarvis-network
+
+  temporal-web:
+    image: temporalio/web:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+    depends_on:
+      - temporal
+    networks:
+      - jarvis-network
+
+  # Database
+  postgresql:
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=temporal
+      - POSTGRES_USER=temporal
+      - POSTGRES_DB=temporal
+    volumes:
+      - temporal_db_data:/var/lib/postgresql/data
+    networks:
+      - jarvis-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - jarvis-network
+
+  # TSAI Jarvis Core Service
+  jarvis-core:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - TEMPORAL_SERVER_URL=temporal:7233
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_URL=postgresql://temporal:temporal@postgresql:5432/temporal
+    depends_on:
+      - temporal
+      - redis
+      - postgresql
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - jarvis-network
+    restart: unless-stopped
+
+  # Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - jarvis-network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - jarvis-network
+
+volumes:
+  temporal_db_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  jarvis-network:
+    driver: bridge
