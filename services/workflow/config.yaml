@@ -1,0 +1,236 @@
+# Jarvis Workflow Service Configuration
+service:
+  name: "jarvis-workflow-service"
+  type: "workflow"
+  version: "1.0.0"
+  description: "Jarvis workflow service for Temporal integration"
+
+# Workflow Configuration
+workflow:
+  type: "temporal"
+  endpoint: "temporal:7233"
+  namespace: "jarvis-workflows"
+  task_queue: "jarvis-pipeline-queue"
+  
+  # Workflow Settings
+  workflow_settings:
+    execution_timeout: "24h"
+    retry_policy:
+      max_attempts: 3
+      backoff_coefficient: 2.0
+      maximum_interval: "1h"
+      initial_interval: "1s"
+    
+    # Workflow Types
+    workflow_types:
+      - "hockey-detection"
+      - "computer-vision"
+      - "autonomous-analysis"
+      - "data-processing"
+      - "model-training"
+      - "model-evaluation"
+      - "model-deployment"
+    
+    # Workflow Templates
+    workflow_templates:
+      hockey-detection:
+        name: "Hockey Detection Workflow"
+        description: "Complete hockey player detection pipeline"
+        steps:
+          - "data_preparation"
+          - "model_training"
+          - "model_evaluation"
+          - "model_deployment"
+        timeout: "12h"
+        retry_policy:
+          max_attempts: 3
+          backoff_coefficient: 2.0
+      
+      computer-vision:
+        name: "Computer Vision Workflow"
+        description: "Computer vision processing pipeline"
+        steps:
+          - "image_processing"
+          - "feature_extraction"
+          - "model_inference"
+        timeout: "6h"
+        retry_policy:
+          max_attempts: 2
+          backoff_coefficient: 1.5
+      
+      autonomous-analysis:
+        name: "Autonomous Analysis Workflow"
+        description: "Autonomous system analysis pipeline"
+        steps:
+          - "data_collection"
+          - "analysis"
+          - "decision_making"
+          - "action_execution"
+        timeout: "8h"
+        retry_policy:
+          max_attempts: 3
+          backoff_coefficient: 2.0
+  
+  # Activity Configuration
+  activity_config:
+    # Activity Timeouts
+    timeouts:
+      data_preparation: "2h"
+      model_training: "6h"
+      model_evaluation: "1h"
+      model_deployment: "1h"
+      image_processing: "1h"
+      feature_extraction: "2h"
+      model_inference: "1h"
+      data_collection: "1h"
+      analysis: "2h"
+      decision_making: "30m"
+      action_execution: "1h"
+    
+    # Activity Retry Policies
+    retry_policies:
+      data_preparation:
+        max_attempts: 3
+        backoff_coefficient: 2.0
+        maximum_interval: "1h"
+      model_training:
+        max_attempts: 2
+        backoff_coefficient: 3.0
+        maximum_interval: "2h"
+      model_evaluation:
+        max_attempts: 3
+        backoff_coefficient: 1.5
+        maximum_interval: "30m"
+      model_deployment:
+        max_attempts: 2
+        backoff_coefficient: 2.0
+        maximum_interval: "1h"
+  
+  # Workflow Monitoring
+  monitoring:
+    enabled: true
+    metrics:
+      - "workflow_started_total"
+      - "workflow_completed_total"
+      - "workflow_failed_total"
+      - "workflow_duration_seconds"
+      - "activity_started_total"
+      - "activity_completed_total"
+      - "activity_failed_total"
+      - "activity_duration_seconds"
+    
+    # Alerting
+    alerting:
+      enabled: true
+      rules:
+        - name: "HighWorkflowFailureRate"
+          condition: "workflow_failed_total / workflow_started_total > 0.1"
+          severity: "warning"
+        - name: "LongRunningWorkflow"
+          condition: "workflow_duration_seconds > 86400"  # 24 hours
+          severity: "critical"
+        - name: "HighActivityFailureRate"
+          condition: "activity_failed_total / activity_started_total > 0.05"
+          severity: "warning"
+  
+  # Workflow Scheduling
+  scheduling:
+    enabled: true
+    cron_schedules:
+      - name: "daily-hockey-analysis"
+        schedule: "0 2 * * *"  # Daily at 2 AM
+        workflow: "hockey-detection"
+        input_data:
+          data_config:
+            samples: 1000
+          training_config:
+            epochs: 50
+      
+      - name: "weekly-model-retraining"
+        schedule: "0 3 * * 0"  # Weekly on Sunday at 3 AM
+        workflow: "model-training"
+        input_data:
+          retrain: true
+          model_version: "latest"
+    
+    # Event-driven triggers
+    event_triggers:
+      - name: "new-data-available"
+        event_type: "data.uploaded"
+        workflow: "hockey-detection"
+        conditions:
+          - "file_type = 'image'"
+          - "file_size > 1MB"
+      
+      - name: "model-performance-degraded"
+        event_type: "model.performance"
+        workflow: "model-retraining"
+        conditions:
+          - "accuracy < 0.8"
+          - "confidence < 0.7"
+
+# Service Configuration
+service_config:
+  # Health Check
+  health_check:
+    enabled: true
+    interval: 30  # seconds
+    timeout: 10   # seconds
+  
+  # Logging
+  logging:
+    level: "INFO"
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    file: "/app/logs/workflow-service.log"
+    max_size: "10MB"
+    backup_count: 5
+  
+  # Performance
+  performance:
+    max_concurrent_workflows: 10
+    max_concurrent_activities: 20
+    workflow_timeout: 86400  # 24 hours
+    activity_timeout: 3600   # 1 hour
+    retry_attempts: 3
+    retry_delay: 5  # seconds
+  
+  # Caching
+  caching:
+    enabled: true
+    cache_dir: "/app/cache"
+    max_cache_size: "100MB"
+    cache_ttl: 3600  # seconds
+    cleanup_interval: 1800  # seconds
+  
+  # Rate Limiting
+  rate_limiting:
+    enabled: true
+    workflows_per_minute: 10
+    activities_per_minute: 100
+    burst_limit: 5
+  
+  # Monitoring
+  monitoring:
+    metrics_enabled: true
+    prometheus_endpoint: "http://prometheus:9090"
+    custom_metrics:
+      - "workflow_started_total"
+      - "workflow_completed_total"
+      - "workflow_failed_total"
+      - "workflow_duration_seconds"
+      - "activity_started_total"
+      - "activity_completed_total"
+      - "activity_failed_total"
+      - "activity_duration_seconds"
+      - "active_workflows"
+      - "active_activities"
+
+# Environment Variables
+environment:
+  JARVIS_CONFIG_PATH: "/app/config/jarvis-core.yaml"
+  TEMPORAL_ENDPOINT: "temporal:7233"
+  TEMPORAL_NAMESPACE: "jarvis-workflows"
+  TEMPORAL_TASK_QUEUE: "jarvis-pipeline-queue"
+  LOG_LEVEL: "INFO"
+  CACHE_DIR: "/app/cache"
+  LOGS_DIR: "/app/logs"

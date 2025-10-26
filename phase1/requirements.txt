@@ -1,0 +1,24 @@
+# Phase 1: Hockey Role Classification Dependencies
+
+# Core ML libraries
+torch>=2.0.0
+torchvision>=0.15.0
+numpy>=1.24.0
+opencv-python>=4.8.0
+scikit-learn>=1.3.0
+
+# YOLO and computer vision
+ultralytics>=8.0.0
+Pillow>=10.0.0
+
+# Data processing
+pandas>=2.0.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# TSAI Integration
+# (Already included in main requirements.txt)
+
+# Development and testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0

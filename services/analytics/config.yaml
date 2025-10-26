@@ -1,0 +1,287 @@
+# Jarvis Analytics Service Configuration
+service:
+  name: "jarvis-analytics-service"
+  type: "analytics"
+  version: "1.0.0"
+  description: "Jarvis analytics service for metrics and monitoring"
+
+# Analytics Configuration
+analytics:
+  type: "prometheus"
+  endpoint: "http://prometheus:9090"
+  dashboard: "http://grafana:3000"
+  
+  # Metrics Configuration
+  metrics:
+    # System Metrics
+    system:
+      - "cpu_usage"
+      - "memory_usage"
+      - "disk_usage"
+      - "network_io"
+      - "gpu_usage"
+      - "temperature"
+    
+    # Application Metrics
+    application:
+      - "request_count"
+      - "request_duration"
+      - "error_rate"
+      - "active_connections"
+      - "response_time"
+      - "throughput"
+    
+    # Business Metrics
+    business:
+      - "experiment_count"
+      - "model_training_time"
+      - "pipeline_success_rate"
+      - "user_engagement"
+      - "prediction_accuracy"
+      - "model_performance"
+    
+    # Workflow Metrics
+    workflow:
+      - "workflow_started"
+      - "workflow_completed"
+      - "workflow_duration"
+      - "workflow_failed"
+      - "workflow_retry_count"
+    
+    # Activity Metrics
+    activity:
+      - "activity_started"
+      - "activity_completed"
+      - "activity_duration"
+      - "activity_failed"
+      - "activity_retry_count"
+  
+  # Alerting Configuration
+  alerting:
+    enabled: true
+    rules:
+      - name: "HighErrorRate"
+        condition: "error_rate > 0.1"
+        severity: "warning"
+        duration: "5m"
+        description: "Error rate is above 10%"
+        actions:
+          - "email"
+          - "slack"
+      
+      - name: "HighCPUUsage"
+        condition: "cpu_usage > 0.8"
+        severity: "critical"
+        duration: "2m"
+        description: "CPU usage is above 80%"
+        actions:
+          - "email"
+          - "slack"
+          - "webhook"
+      
+      - name: "LowDiskSpace"
+        condition: "disk_usage > 0.9"
+        severity: "critical"
+        duration: "1m"
+        description: "Disk usage is above 90%"
+        actions:
+          - "email"
+          - "slack"
+          - "webhook"
+      
+      - name: "LongRunningWorkflow"
+        condition: "workflow_duration > 86400"  # 24 hours
+        severity: "warning"
+        duration: "10m"
+        description: "Workflow has been running for more than 24 hours"
+        actions:
+          - "email"
+      
+      - name: "HighActivityFailureRate"
+        condition: "activity_failed / activity_started > 0.05"
+        severity: "warning"
+        duration: "5m"
+        description: "Activity failure rate is above 5%"
+        actions:
+          - "email"
+          - "slack"
+    
+    # Alert Channels
+    channels:
+      email:
+        enabled: true
+        smtp_server: "${SMTP_SERVER}"
+        smtp_port: 587
+        username: "${SMTP_USERNAME}"
+        password: "${SMTP_PASSWORD}"
+        from_address: "jarvis@tsai.ai"
+        to_addresses:
+          - "admin@tsai.ai"
+          - "devops@tsai.ai"
+      
+      slack:
+        enabled: true
+        webhook_url: "${SLACK_WEBHOOK_URL}"
+        channel: "#jarvis-alerts"
+        username: "Jarvis Bot"
+        icon_emoji: ":robot_face:"
+      
+      webhook:
+        enabled: true
+        url: "${WEBHOOK_URL}"
+        timeout: 30
+        retry_attempts: 3
+        retry_delay: 5
+  
+  # Dashboard Configuration
+  dashboards:
+    # System Dashboard
+    system:
+      name: "Jarvis System Dashboard"
+      description: "System metrics and health monitoring"
+      panels:
+        - title: "CPU Usage"
+          type: "graph"
+          targets:
+            - "jarvis_cpu_usage_percent"
+        - title: "Memory Usage"
+          type: "graph"
+          targets:
+            - "jarvis_memory_usage_bytes"
+        - title: "Disk Usage"
+          type: "graph"
+          targets:
+            - "jarvis_disk_usage_bytes"
+        - title: "Network I/O"
+          type: "graph"
+          targets:
+            - "jarvis_network_io_bytes_total"
+    
+    # Application Dashboard
+    application:
+      name: "Jarvis Application Dashboard"
+      description: "Application performance and metrics"
+      panels:
+        - title: "Request Rate"
+          type: "graph"
+          targets:
+            - "jarvis_requests_total"
+        - title: "Response Time"
+          type: "graph"
+          targets:
+            - "jarvis_request_duration_seconds"
+        - title: "Error Rate"
+          type: "graph"
+          targets:
+            - "jarvis_error_rate"
+        - title: "Active Connections"
+          type: "graph"
+          targets:
+            - "jarvis_active_connections"
+    
+    # Business Dashboard
+    business:
+      name: "Jarvis Business Dashboard"
+      description: "Business metrics and KPIs"
+      panels:
+        - title: "Experiments"
+          type: "graph"
+          targets:
+            - "jarvis_experiments_total"
+        - title: "Model Training Time"
+          type: "graph"
+          targets:
+            - "jarvis_model_training_duration_seconds"
+        - title: "Pipeline Success Rate"
+          type: "graph"
+          targets:
+            - "jarvis_pipeline_success_rate"
+        - title: "User Engagement"
+          type: "graph"
+          targets:
+            - "jarvis_user_engagement_total"
+    
+    # Workflow Dashboard
+    workflow:
+      name: "Jarvis Workflow Dashboard"
+      description: "Workflow execution and performance"
+      panels:
+        - title: "Workflows Started"
+          type: "graph"
+          targets:
+            - "jarvis_workflow_started_total"
+        - title: "Workflows Completed"
+          type: "graph"
+          targets:
+            - "jarvis_workflow_completed_total"
+        - title: "Workflow Duration"
+          type: "graph"
+          targets:
+            - "jarvis_workflow_duration_seconds"
+        - title: "Activity Performance"
+          type: "graph"
+          targets:
+            - "jarvis_activity_duration_seconds"
+
+# Service Configuration
+service_config:
+  # Health Check
+  health_check:
+    enabled: true
+    interval: 30  # seconds
+    timeout: 10   # seconds
+  
+  # Logging
+  logging:
+    level: "INFO"
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    file: "/app/logs/analytics-service.log"
+    max_size: "10MB"
+    backup_count: 5
+  
+  # Performance
+  performance:
+    metrics_collection_interval: 30  # seconds
+    metrics_retention_days: 30
+    max_metrics_per_component: 1000
+    metrics_compression: true
+  
+  # Caching
+  caching:
+    enabled: true
+    cache_dir: "/app/cache"
+    max_cache_size: "100MB"
+    cache_ttl: 3600  # seconds
+    cleanup_interval: 1800  # seconds
+  
+  # Rate Limiting
+  rate_limiting:
+    enabled: true
+    metrics_per_minute: 1000
+    alerts_per_minute: 10
+    burst_limit: 100
+  
+  # Monitoring
+  monitoring:
+    metrics_enabled: true
+    prometheus_endpoint: "http://prometheus:9090"
+    grafana_endpoint: "http://grafana:3000"
+    custom_metrics:
+      - "metrics_collected_total"
+      - "alerts_sent_total"
+      - "dashboards_created_total"
+      - "data_points_processed_total"
+
+# Environment Variables
+environment:
+  JARVIS_CONFIG_PATH: "/app/config/jarvis-core.yaml"
+  PROMETHEUS_ENDPOINT: "http://prometheus:9090"
+  GRAFANA_ENDPOINT: "http://grafana:3000"
+  SMTP_SERVER: "${SMTP_SERVER}"
+  SMTP_USERNAME: "${SMTP_USERNAME}"
+  SMTP_PASSWORD: "${SMTP_PASSWORD}"
+  SLACK_WEBHOOK_URL: "${SLACK_WEBHOOK_URL}"
+  WEBHOOK_URL: "${WEBHOOK_URL}"
+  LOG_LEVEL: "INFO"
+  CACHE_DIR: "/app/cache"
+  LOGS_DIR: "/app/logs"

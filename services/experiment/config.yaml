@@ -1,0 +1,191 @@
+# Jarvis Experiment Service Configuration
+service:
+  name: "jarvis-experiment-service"
+  type: "experiment"
+  version: "1.0.0"
+  description: "Jarvis experiment service for MLflow integration"
+
+# Experiment Configuration
+experiment:
+  type: "mlflow"
+  tracking_uri: "http://mlflow:5000"
+  registry_uri: "postgresql://postgres:password@postgres:5432/mlflow"
+  artifacts_uri: "s3://jarvis-artifacts/mlflow"
+  
+  # Experiment Settings
+  experiment_settings:
+    name: "jarvis-experiments"
+    description: "Jarvis Core Experiments"
+    tags:
+      - "jarvis"
+      - "tsai"
+      - "ai"
+  
+  # Model Registry
+  model_registry:
+    name: "jarvis-models"
+    description: "Jarvis Model Registry"
+    stages:
+      - "None"
+      - "Staging"
+      - "Production"
+      - "Archived"
+  
+  # Experiment Types
+  experiment_types:
+    - "hockey-detection"
+    - "computer-vision"
+    - "autonomous-analysis"
+    - "data-processing"
+    - "model-training"
+    - "model-evaluation"
+  
+  # Metrics Configuration
+  metrics:
+    # System Metrics
+    system:
+      - "cpu_usage"
+      - "memory_usage"
+      - "gpu_usage"
+      - "disk_usage"
+      - "network_io"
+    
+    # Training Metrics
+    training:
+      - "loss"
+      - "accuracy"
+      - "precision"
+      - "recall"
+      - "f1_score"
+      - "auc"
+      - "learning_rate"
+      - "epoch"
+      - "batch_size"
+    
+    # Model Metrics
+    model:
+      - "model_size"
+      - "inference_time"
+      - "prediction_confidence"
+      - "model_complexity"
+      - "parameter_count"
+    
+    # Business Metrics
+    business:
+      - "user_satisfaction"
+      - "prediction_accuracy"
+      - "model_performance"
+      - "deployment_success"
+  
+  # Artifact Configuration
+  artifacts:
+    enabled: true
+    max_size: "1GB"
+    supported_types:
+      - "model"
+      - "dataset"
+      - "visualization"
+      - "report"
+      - "config"
+      - "log"
+    
+    # Artifact Storage
+    storage:
+      type: "s3"
+      bucket: "jarvis-artifacts"
+      prefix: "mlflow"
+      compression: true
+      encryption: true
+  
+  # Experiment Lifecycle
+  lifecycle:
+    # Run Management
+    run_management:
+      max_runs_per_experiment: 1000
+      run_retention_days: 365
+      auto_cleanup: true
+      cleanup_schedule: "0 2 * * *"  # Daily at 2 AM
+    
+    # Model Management
+    model_management:
+      max_versions_per_model: 100
+      version_retention_days: 730
+      auto_archive: true
+      archive_schedule: "0 3 * * 0"  # Weekly on Sunday at 3 AM
+    
+    # Experiment Comparison
+    comparison:
+      max_comparison_runs: 50
+      comparison_metrics:
+        - "accuracy"
+        - "loss"
+        - "f1_score"
+        - "inference_time"
+      visualization:
+        enabled: true
+        chart_types:
+          - "line"
+          - "bar"
+          - "scatter"
+          - "heatmap"
+
+# Service Configuration
+service_config:
+  # Health Check
+  health_check:
+    enabled: true
+    interval: 30  # seconds
+    timeout: 10   # seconds
+  
+  # Logging
+  logging:
+    level: "INFO"
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    file: "/app/logs/experiment-service.log"
+    max_size: "10MB"
+    backup_count: 5
+  
+  # Performance
+  performance:
+    max_concurrent_runs: 10
+    run_timeout: 86400  # 24 hours
+    artifact_upload_timeout: 3600  # 1 hour
+    retry_attempts: 3
+    retry_delay: 5  # seconds
+  
+  # Caching
+  caching:
+    enabled: true
+    cache_dir: "/app/cache"
+    max_cache_size: "500MB"
+    cache_ttl: 3600  # seconds
+    cleanup_interval: 1800  # seconds
+  
+  # Rate Limiting
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 100
+    burst_limit: 20
+  
+  # Monitoring
+  monitoring:
+    metrics_enabled: true
+    prometheus_endpoint: "http://prometheus:9090"
+    custom_metrics:
+      - "experiments_created_total"
+      - "runs_started_total"
+      - "runs_completed_total"
+      - "models_registered_total"
+      - "artifacts_uploaded_total"
+      - "experiment_duration_seconds"
+      - "active_runs"
+
+# Environment Variables
+environment:
+  JARVIS_CONFIG_PATH: "/app/config/jarvis-core.yaml"
+  MLFLOW_TRACKING_URI: "http://mlflow:5000"
+  MLFLOW_REGISTRY_URI: "postgresql://postgres:password@postgres:5432/mlflow"
+  MLFLOW_ARTIFACTS_URI: "s3://jarvis-artifacts/mlflow"
+  LOG_LEVEL: "INFO"
+  CACHE_DIR: "/app/cache"
+  LOGS_DIR: "/app/logs"

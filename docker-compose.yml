@@ -1,87 +1,102 @@
+# Jarvis Core Services Docker Compose
 version: '3.8'
 
 services:
-  # Temporal AI Infrastructure
-  temporal:
-    image: temporalio/auto-setup:latest
-    ports:
-      - "7233:7233"
-    environment:
-      - DB=postgres12
-      - DB_PORT=5432
-      - POSTGRES_USER=temporal
-      - POSTGRES_PWD=temporal
-      - POSTGRES_SEEDS=postgresql
-      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
-    volumes:
-      - ./config/temporal:/etc/temporal/config/dynamicconfig
-    depends_on:
-      - postgresql
-    networks:
-      - jarvis-network
-
-  temporal-web:
-    image: temporalio/web:latest
-    ports:
-      - "8080:8080"
-    environment:
-      - TEMPORAL_ADDRESS=temporal:7233
-    depends_on:
-      - temporal
-    networks:
-      - jarvis-network
-
-  # Database
-  postgresql:
+  # Core Infrastructure
+  postgres:
     image: postgres:13
+    container_name: jarvis-postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=jarvis
     ports:
       - "5432:5432"
-    environment:
-      - POSTGRES_PASSWORD=temporal
-      - POSTGRES_USER=temporal
-      - POSTGRES_DB=temporal
     volumes:
-      - temporal_db_data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - jarvis-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # Redis Cache
-  redis:
-    image: redis:7-alpine
+  minio:
+    image: minio/minio:latest
+    container_name: jarvis-minio
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
     ports:
-      - "6379:6379"
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
     volumes:
-      - redis_data:/data
+      - minio-data:/data
     networks:
       - jarvis-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # TSAI Jarvis Core Service
-  jarvis-core:
-    build: .
-    ports:
-      - "8000:8000"
+  temporal:
+    image: temporalio/auto-setup:1.20.0
+    container_name: jarvis-temporal
     environment:
-      - TEMPORAL_SERVER_URL=temporal:7233
-      - REDIS_URL=redis://redis:6379
-      - POSTGRES_URL=postgresql://temporal:temporal@postgresql:5432/temporal
+      - DB=postgresql
+      - DB_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PWD=password
+      - POSTGRES_SE_USER=postgres
+      - POSTGRES_TLS=false
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+    ports:
+      - "7233:7233"
+      - "8080:8080"
     depends_on:
-      - temporal
-      - redis
-      - postgresql
-    volumes:
-      - ./logs:/app/logs
+      postgres:
+        condition: service_healthy
     networks:
       - jarvis-network
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/namespaces"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # Monitoring
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.10.2
+    container_name: jarvis-mlflow
+    environment:
+      - MLFLOW_BACKEND_STORE_URI=postgresql://postgres:password@postgres:5432/mlflow
+      - MLFLOW_DEFAULT_ARTIFACT_ROOT=s3://jarvis-artifacts/mlflow
+    ports:
+      - "5000:5000"
+    command: mlflow server --host 0.0.0.0 --port 5000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - jarvis-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   prometheus:
     image: prom/prometheus:latest
+    container_name: jarvis-prometheus
     ports:
       - "9090:9090"
     volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -90,25 +105,163 @@ services:
       - '--web.enable-lifecycle'
     networks:
       - jarvis-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   grafana:
     image: grafana/grafana:latest
+    container_name: jarvis-grafana
     ports:
       - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
-      - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - grafana-data:/var/lib/grafana
+      - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./config/grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
     networks:
       - jarvis-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Jarvis Core Services
+  storage-service:
+    build: ./services/storage
+    container_name: jarvis-storage-service
+    ports:
+      - "8081:8080"
+    environment:
+      - JARVIS_CONFIG_PATH=/app/config/jarvis-core.yaml
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+    depends_on:
+      minio:
+        condition: service_healthy
+    networks:
+      - jarvis-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  client-storage-service:
+    build: ./services/client-storage
+    container_name: jarvis-client-storage-service
+    ports:
+      - "8082:8080"
+    environment:
+      - JARVIS_CONFIG_PATH=/app/config/jarvis-core.yaml
+      - GOOGLE_CREDENTIALS_FILE=/app/config/google-credentials.json
+      - ICLOUD_USERNAME=${ICLOUD_USERNAME}
+      - ICLOUD_PASSWORD=${ICLOUD_PASSWORD}
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+    depends_on:
+      - storage-service
+    networks:
+      - jarvis-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  experiment-service:
+    build: ./services/experiment
+    container_name: jarvis-experiment-service
+    ports:
+      - "8083:8080"
+    environment:
+      - JARVIS_CONFIG_PATH=/app/config/jarvis-core.yaml
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - MLFLOW_REGISTRY_URI=postgresql://postgres:password@postgres:5432/mlflow
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    networks:
+      - jarvis-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  workflow-service:
+    build: ./services/workflow
+    container_name: jarvis-workflow-service
+    ports:
+      - "8084:8080"
+    environment:
+      - JARVIS_CONFIG_PATH=/app/config/jarvis-core.yaml
+      - TEMPORAL_ENDPOINT=temporal:7233
+      - TEMPORAL_NAMESPACE=jarvis-workflows
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+    depends_on:
+      temporal:
+        condition: service_healthy
+    networks:
+      - jarvis-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  analytics-service:
+    build: ./services/analytics
+    container_name: jarvis-analytics-service
+    ports:
+      - "8085:8080"
+    environment:
+      - JARVIS_CONFIG_PATH=/app/config/jarvis-core.yaml
+      - PROMETHEUS_ENDPOINT=http://prometheus:9090
+      - GRAFANA_ENDPOINT=http://grafana:3000
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+    depends_on:
+      prometheus:
+        condition: service_healthy
+      grafana:
+        condition: service_healthy
+    networks:
+      - jarvis-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
-  temporal_db_data:
-  redis_data:
-  prometheus_data:
-  grafana_data:
+  postgres-data:
+  minio-data:
+  prometheus-data:
+  grafana-data:
 
 networks:
   jarvis-network:

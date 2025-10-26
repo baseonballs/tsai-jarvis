@@ -1,0 +1,252 @@
+# Jarvis Core Configuration
+jarvis_core:
+  version: "1.0.0"
+  description: "Jarvis Core Services for TSAI Ecosystem"
+  
+  # Services Configuration
+  services:
+    # Storage Service (MinIO Backend)
+    storage:
+      type: "minio"
+      endpoint: "http://minio:9000"
+      access_key: "minioadmin"
+      secret_key: "minioadmin"
+      secure: false
+      buckets:
+        - "jarvis-artifacts"
+        - "jarvis-models"
+        - "jarvis-datasets"
+        - "jarvis-logs"
+      
+      # Bucket Policies
+      bucket_policies:
+        jarvis-artifacts:
+          policy: "read-write"
+          retention: "30d"
+        jarvis-models:
+          policy: "read-write"
+          retention: "1y"
+        jarvis-datasets:
+          policy: "read-write"
+          retention: "6m"
+        jarvis-logs:
+          policy: "read-write"
+          retention: "7d"
+    
+    # Client Storage Service (GDrive/iCloud)
+    client_storage:
+      type: "cloud-drive"
+      providers:
+        google_drive:
+          enabled: true
+          credentials_file: "/app/config/google-credentials.json"
+          scopes:
+            - "https://www.googleapis.com/auth/drive"
+            - "https://www.googleapis.com/auth/drive.file"
+          default_folder: "Jarvis AI"
+        
+        icloud_drive:
+          enabled: true
+          username: "${ICLOUD_USERNAME}"
+          password: "${ICLOUD_PASSWORD}"
+          default_folder: "Jarvis AI"
+        
+        onedrive:
+          enabled: false
+          client_id: "${ONEDRIVE_CLIENT_ID}"
+          client_secret: "${ONEDRIVE_CLIENT_SECRET}"
+          default_folder: "Jarvis AI"
+      
+      # File Type Support
+      supported_types:
+        images:
+          - "image/jpeg"
+          - "image/png"
+          - "image/gif"
+          - "image/webp"
+        videos:
+          - "video/mp4"
+          - "video/mov"
+          - "video/avi"
+          - "video/mkv"
+        documents:
+          - "application/pdf"
+          - "text/plain"
+          - "application/json"
+          - "text/csv"
+        datasets:
+          - "application/zip"
+          - "application/x-tar"
+          - "application/gzip"
+    
+    # Experiment Service (MLflow)
+    experiment:
+      type: "mlflow"
+      tracking_uri: "http://mlflow:5000"
+      registry_uri: "postgresql://postgres:password@postgres:5432/mlflow"
+      artifacts_uri: "s3://jarvis-artifacts/mlflow"
+      
+      # Experiment Settings
+      experiment_settings:
+        name: "jarvis-experiments"
+        description: "Jarvis Core Experiments"
+        tags:
+          - "jarvis"
+          - "tsai"
+          - "ai"
+      
+      # Model Registry
+      model_registry:
+        name: "jarvis-models"
+        description: "Jarvis Model Registry"
+        stages:
+          - "None"
+          - "Staging"
+          - "Production"
+          - "Archived"
+    
+    # Workflow Service (Temporal)
+    workflow:
+      type: "temporal"
+      endpoint: "temporal:7233"
+      namespace: "jarvis-workflows"
+      task_queue: "jarvis-pipeline-queue"
+      
+      # Workflow Settings
+      workflow_settings:
+        execution_timeout: "24h"
+        retry_policy:
+          max_attempts: 3
+          backoff_coefficient: 2.0
+          maximum_interval: "1h"
+        
+        # Workflow Types
+        workflow_types:
+          - "hockey-detection"
+          - "computer-vision"
+          - "autonomous-analysis"
+          - "data-processing"
+    
+    # Analytics Service (Prometheus/Grafana)
+    analytics:
+      type: "prometheus"
+      endpoint: "http://prometheus:9090"
+      dashboard: "http://grafana:3000"
+      
+      # Metrics Configuration
+      metrics:
+        # System Metrics
+        system:
+          - "cpu_usage"
+          - "memory_usage"
+          - "disk_usage"
+          - "network_io"
+        
+        # Application Metrics
+        application:
+          - "request_count"
+          - "request_duration"
+          - "error_rate"
+          - "active_connections"
+        
+        # Business Metrics
+        business:
+          - "experiment_count"
+          - "model_training_time"
+          - "pipeline_success_rate"
+          - "user_engagement"
+      
+      # Alerting
+      alerting:
+        enabled: true
+        rules:
+          - name: "HighErrorRate"
+            condition: "error_rate > 0.1"
+            severity: "warning"
+          - name: "HighCPUUsage"
+            condition: "cpu_usage > 0.8"
+            severity: "critical"
+          - name: "LowDiskSpace"
+            condition: "disk_usage > 0.9"
+            severity: "critical"
+    
+    # Security Service
+    security:
+      type: "auth"
+      provider: "jwt"
+      secret_key: "${JWT_SECRET_KEY}"
+      algorithm: "HS256"
+      expiration: "24h"
+      
+      # RBAC Configuration
+      rbac:
+        roles:
+          - name: "admin"
+            permissions:
+              - "read:*"
+              - "write:*"
+              - "delete:*"
+          - name: "developer"
+            permissions:
+              - "read:*"
+              - "write:experiments"
+              - "write:models"
+          - name: "user"
+            permissions:
+              - "read:artifacts"
+              - "read:experiments"
+              - "write:client_storage"
+    
+    # Notification Service
+    notification:
+      type: "multi-channel"
+      channels:
+        email:
+          enabled: true
+          smtp_server: "${SMTP_SERVER}"
+          smtp_port: 587
+          username: "${SMTP_USERNAME}"
+          password: "${SMTP_PASSWORD}"
+        
+        slack:
+          enabled: true
+          webhook_url: "${SLACK_WEBHOOK_URL}"
+          channel: "#jarvis-alerts"
+        
+        webhook:
+          enabled: true
+          url: "${WEBHOOK_URL}"
+          timeout: 30
+      
+      # Notification Rules
+      rules:
+        - name: "ExperimentCompleted"
+          trigger: "experiment.completed"
+          channels: ["email", "slack"]
+        - name: "ModelDeployed"
+          trigger: "model.deployed"
+          channels: ["email"]
+        - name: "SystemError"
+          trigger: "system.error"
+          channels: ["slack", "webhook"]
+
+# Environment Configuration
+environment:
+  development:
+    log_level: "DEBUG"
+    debug: true
+    hot_reload: true
+  
+  staging:
+    log_level: "INFO"
+    debug: false
+    hot_reload: false
+  
+  production:
+    log_level: "WARNING"
+    debug: false
+    hot_reload: false
+    security:
+      encryption: true
+      audit_logging: true
+      rate_limiting: true

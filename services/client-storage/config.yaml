@@ -1,0 +1,192 @@
+# Jarvis Client Storage Service Configuration
+service:
+  name: "jarvis-client-storage-service"
+  type: "client-storage"
+  version: "1.0.0"
+  description: "Jarvis client storage service for user-facing storage"
+
+# Client Storage Configuration
+client_storage:
+  type: "cloud-drive"
+  
+  # Cloud Drive Providers
+  providers:
+    google_drive:
+      enabled: true
+      credentials_file: "/app/config/google-credentials.json"
+      token_file: "/app/config/google-token.json"
+      scopes:
+        - "https://www.googleapis.com/auth/drive"
+        - "https://www.googleapis.com/auth/drive.file"
+      default_folder: "Jarvis AI"
+      max_file_size: "10GB"
+      supported_formats:
+        - "image/jpeg"
+        - "image/png"
+        - "image/gif"
+        - "image/webp"
+        - "video/mp4"
+        - "video/mov"
+        - "video/avi"
+        - "video/mkv"
+        - "application/pdf"
+        - "text/plain"
+        - "application/json"
+        - "text/csv"
+        - "application/zip"
+        - "application/x-tar"
+        - "application/gzip"
+    
+    icloud_drive:
+      enabled: true
+      username: "${ICLOUD_USERNAME}"
+      password: "${ICLOUD_PASSWORD}"
+      default_folder: "Jarvis AI"
+      max_file_size: "5GB"
+      supported_formats:
+        - "image/jpeg"
+        - "image/png"
+        - "image/gif"
+        - "video/mp4"
+        - "video/mov"
+        - "application/pdf"
+        - "text/plain"
+        - "application/json"
+    
+    onedrive:
+      enabled: false
+      client_id: "${ONEDRIVE_CLIENT_ID}"
+      client_secret: "${ONEDRIVE_CLIENT_SECRET}"
+      default_folder: "Jarvis AI"
+      max_file_size: "10GB"
+      supported_formats:
+        - "image/jpeg"
+        - "image/png"
+        - "image/gif"
+        - "video/mp4"
+        - "video/mov"
+        - "application/pdf"
+        - "text/plain"
+        - "application/json"
+  
+  # File Type Support
+  supported_types:
+    images:
+      - "image/jpeg"
+      - "image/png"
+      - "image/gif"
+      - "image/webp"
+      - "image/bmp"
+      - "image/tiff"
+    videos:
+      - "video/mp4"
+      - "video/mov"
+      - "video/avi"
+      - "video/mkv"
+      - "video/webm"
+      - "video/3gp"
+    documents:
+      - "application/pdf"
+      - "text/plain"
+      - "application/json"
+      - "text/csv"
+      - "application/msword"
+      - "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    datasets:
+      - "application/zip"
+      - "application/x-tar"
+      - "application/gzip"
+      - "application/x-7z-compressed"
+    audio:
+      - "audio/mp3"
+      - "audio/wav"
+      - "audio/m4a"
+      - "audio/ogg"
+  
+  # Import/Export Settings
+  import_settings:
+    max_files_per_import: 100
+    max_total_size: "1GB"
+    auto_organize: true
+    create_thumbnails: true
+    extract_metadata: true
+    duplicate_detection: true
+  
+  export_settings:
+    max_files_per_export: 50
+    max_total_size: "500MB"
+    create_zip_archives: true
+    include_metadata: true
+    generate_reports: true
+  
+  # Security Settings
+  security:
+    encrypt_uploads: false
+    virus_scan: true
+    content_filtering: true
+    access_logging: true
+    audit_logging: true
+
+# Service Configuration
+service_config:
+  # Health Check
+  health_check:
+    enabled: true
+    interval: 30  # seconds
+    timeout: 10   # seconds
+  
+  # Logging
+  logging:
+    level: "INFO"
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    file: "/app/logs/client-storage-service.log"
+    max_size: "10MB"
+    backup_count: 5
+  
+  # Performance
+  performance:
+    max_concurrent_downloads: 5
+    max_concurrent_uploads: 3
+    download_timeout: 300  # seconds
+    upload_timeout: 600   # seconds
+    retry_attempts: 3
+    retry_delay: 5  # seconds
+  
+  # Caching
+  caching:
+    enabled: true
+    cache_dir: "/app/cache"
+    max_cache_size: "1GB"
+    cache_ttl: 3600  # seconds
+    cleanup_interval: 1800  # seconds
+  
+  # Rate Limiting
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 60
+    burst_limit: 10
+  
+  # Monitoring
+  monitoring:
+    metrics_enabled: true
+    prometheus_endpoint: "http://prometheus:9090"
+    custom_metrics:
+      - "files_imported_total"
+      - "files_exported_total"
+      - "import_duration_seconds"
+      - "export_duration_seconds"
+      - "storage_usage_bytes"
+      - "active_connections"
+
+# Environment Variables
+environment:
+  JARVIS_CONFIG_PATH: "/app/config/jarvis-core.yaml"
+  GOOGLE_CREDENTIALS_FILE: "/app/config/google-credentials.json"
+  GOOGLE_TOKEN_FILE: "/app/config/google-token.json"
+  ICLOUD_USERNAME: "${ICLOUD_USERNAME}"
+  ICLOUD_PASSWORD: "${ICLOUD_PASSWORD}"
+  ONEDRIVE_CLIENT_ID: "${ONEDRIVE_CLIENT_ID}"
+  ONEDRIVE_CLIENT_SECRET: "${ONEDRIVE_CLIENT_SECRET}"
+  LOG_LEVEL: "INFO"
+  CACHE_DIR: "/app/cache"
+  LOGS_DIR: "/app/logs"

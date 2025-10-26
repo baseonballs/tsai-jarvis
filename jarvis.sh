@@ -33,6 +33,9 @@ readonly ADVANCED_VISUALIZATION_PORT="${ADVANCED_VISUALIZATION_PORT:-8008}"
 readonly MACHINE_LEARNING_PORT="${MACHINE_LEARNING_PORT:-8009}"
 readonly ENTERPRISE_SECURITY_PORT="${ENTERPRISE_SECURITY_PORT:-8010}"
 readonly ADVANCED_ANALYTICS_PORT="${ADVANCED_ANALYTICS_PORT:-8011}"
+readonly TOOLCHAIN_INTEGRATION_PORT="${TOOLCHAIN_INTEGRATION_PORT:-8013}"
+readonly AUTOPILOT_INTEGRATION_PORT="${AUTOPILOT_INTEGRATION_PORT:-8014}"
+readonly SPOTLIGHT_INTEGRATION_PORT="${SPOTLIGHT_INTEGRATION_PORT:-8015}"
 
 # PID files for service management
 readonly DASHBOARD_PID_FILE="/tmp/tsai-jarvis-dashboard.pid"
@@ -43,6 +46,9 @@ readonly ADVANCED_VISUALIZATION_PID_FILE="/tmp/tsai-jarvis-advanced-visualizatio
 readonly MACHINE_LEARNING_PID_FILE="/tmp/tsai-jarvis-machine-learning.pid"
 readonly ENTERPRISE_SECURITY_PID_FILE="/tmp/tsai-jarvis-enterprise-security.pid"
 readonly ADVANCED_ANALYTICS_PID_FILE="/tmp/tsai-jarvis-advanced-analytics.pid"
+readonly TOOLCHAIN_INTEGRATION_PID_FILE="/tmp/tsai-jarvis-toolchain-integration.pid"
+readonly AUTOPILOT_INTEGRATION_PID_FILE="/tmp/tsai-jarvis-autopilot-integration.pid"
+readonly SPOTLIGHT_INTEGRATION_PID_FILE="/tmp/tsai-jarvis-spotlight-integration.pid"
 
 # Enhanced colors for output
 readonly RED='\033[0;31m'
@@ -1036,6 +1042,139 @@ start_advanced_analytics() {
     return 0
 }
 
+# TSAI Ecosystem Integration Services
+start_toolchain_integration() {
+    local background_mode="${1:-false}"
+    
+    log_step "Starting Toolchain Integration API on port $TOOLCHAIN_INTEGRATION_PORT..."
+    
+    # Check if port is already in use
+    if is_port_in_use "$TOOLCHAIN_INTEGRATION_PORT"; then
+        log_warning "Toolchain Integration port $TOOLCHAIN_INTEGRATION_PORT is already in use"
+        return 1
+    fi
+    
+    # Check if API file exists
+    if [[ ! -f "$PROJECT_ROOT/hockey-analytics/toolchain_integration_api.py" ]]; then
+        log_error "Toolchain Integration API file not found"
+        return 1
+    fi
+    
+    # Ensure we're in the project root
+    cd "$PROJECT_ROOT"
+    
+    # Activate virtual environment
+    if [[ -f "venv/bin/activate" ]]; then
+        source venv/bin/activate
+    else
+        log_error "Virtual environment not found"
+        return 1
+    fi
+    
+    # Start the service
+    if [[ "$background_mode" == "true" ]]; then
+        nohup python hockey-analytics/toolchain_integration_api.py > /tmp/tsai-jarvis-toolchain-integration.log 2>&1 &
+        local toolchain_integration_pid=$!
+        echo "$toolchain_integration_pid" > "$TOOLCHAIN_INTEGRATION_PID_FILE"
+        log_success "Toolchain Integration API service started in background (PID: $toolchain_integration_pid)"
+    else
+        python hockey-analytics/toolchain_integration_api.py &
+        local toolchain_integration_pid=$!
+        echo "$toolchain_integration_pid" > "$TOOLCHAIN_INTEGRATION_PID_FILE"
+        log_success "Toolchain Integration API service started (PID: $toolchain_integration_pid)"
+    fi
+    
+    return 0
+}
+
+start_autopilot_integration() {
+    local background_mode="${1:-false}"
+    
+    log_step "Starting Autopilot Integration API on port $AUTOPILOT_INTEGRATION_PORT..."
+    
+    # Check if port is already in use
+    if is_port_in_use "$AUTOPILOT_INTEGRATION_PORT"; then
+        log_warning "Autopilot Integration port $AUTOPILOT_INTEGRATION_PORT is already in use"
+        return 1
+    fi
+    
+    # Check if API file exists
+    if [[ ! -f "$PROJECT_ROOT/hockey-analytics/autopilot_integration_api.py" ]]; then
+        log_error "Autopilot Integration API file not found"
+        return 1
+    fi
+    
+    # Ensure we're in the project root
+    cd "$PROJECT_ROOT"
+    
+    # Activate virtual environment
+    if [[ -f "venv/bin/activate" ]]; then
+        source venv/bin/activate
+    else
+        log_error "Virtual environment not found"
+        return 1
+    fi
+    
+    # Start the service
+    if [[ "$background_mode" == "true" ]]; then
+        nohup python hockey-analytics/autopilot_integration_api.py > /tmp/tsai-jarvis-autopilot-integration.log 2>&1 &
+        local autopilot_integration_pid=$!
+        echo "$autopilot_integration_pid" > "$AUTOPILOT_INTEGRATION_PID_FILE"
+        log_success "Autopilot Integration API service started in background (PID: $autopilot_integration_pid)"
+    else
+        python hockey-analytics/autopilot_integration_api.py &
+        local autopilot_integration_pid=$!
+        echo "$autopilot_integration_pid" > "$AUTOPILOT_INTEGRATION_PID_FILE"
+        log_success "Autopilot Integration API service started (PID: $autopilot_integration_pid)"
+    fi
+    
+    return 0
+}
+
+start_spotlight_integration() {
+    local background_mode="${1:-false}"
+    
+    log_step "Starting Spotlight Integration API on port $SPOTLIGHT_INTEGRATION_PORT..."
+    
+    # Check if port is already in use
+    if is_port_in_use "$SPOTLIGHT_INTEGRATION_PORT"; then
+        log_warning "Spotlight Integration port $SPOTLIGHT_INTEGRATION_PORT is already in use"
+        return 1
+    fi
+    
+    # Check if API file exists
+    if [[ ! -f "$PROJECT_ROOT/hockey-analytics/spotlight_integration_api.py" ]]; then
+        log_error "Spotlight Integration API file not found"
+        return 1
+    fi
+    
+    # Ensure we're in the project root
+    cd "$PROJECT_ROOT"
+    
+    # Activate virtual environment
+    if [[ -f "venv/bin/activate" ]]; then
+        source venv/bin/activate
+    else
+        log_error "Virtual environment not found"
+        return 1
+    fi
+    
+    # Start the service
+    if [[ "$background_mode" == "true" ]]; then
+        nohup python hockey-analytics/spotlight_integration_api.py > /tmp/tsai-jarvis-spotlight-integration.log 2>&1 &
+        local spotlight_integration_pid=$!
+        echo "$spotlight_integration_pid" > "$SPOTLIGHT_INTEGRATION_PID_FILE"
+        log_success "Spotlight Integration API service started in background (PID: $spotlight_integration_pid)"
+    else
+        python hockey-analytics/spotlight_integration_api.py &
+        local spotlight_integration_pid=$!
+        echo "$spotlight_integration_pid" > "$SPOTLIGHT_INTEGRATION_PID_FILE"
+        log_success "Spotlight Integration API service started (PID: $spotlight_integration_pid)"
+    fi
+    
+    return 0
+}
+
 # Start all services
 start_all() {
     local background_mode=false
@@ -1070,6 +1209,9 @@ start_all() {
         "Machine Learning:$MACHINE_LEARNING_PORT:start_machine_learning"
         "Enterprise Security:$ENTERPRISE_SECURITY_PORT:start_enterprise_security"
         "Advanced Analytics:$ADVANCED_ANALYTICS_PORT:start_advanced_analytics"
+        "Toolchain Integration:$TOOLCHAIN_INTEGRATION_PORT:start_toolchain_integration"
+        "Autopilot Integration:$AUTOPILOT_INTEGRATION_PORT:start_autopilot_integration"
+        "Spotlight Integration:$SPOTLIGHT_INTEGRATION_PORT:start_spotlight_integration"
     )
     
     # Clean up any remaining processes on our ports first
@@ -1083,6 +1225,9 @@ start_all() {
         "$MACHINE_LEARNING_PORT:Machine Learning"
         "$ENTERPRISE_SECURITY_PORT:Enterprise Security"
         "$ADVANCED_ANALYTICS_PORT:Advanced Analytics"
+        "$TOOLCHAIN_INTEGRATION_PORT:Toolchain Integration"
+        "$AUTOPILOT_INTEGRATION_PORT:Autopilot Integration"
+        "$SPOTLIGHT_INTEGRATION_PORT:Spotlight Integration"
     )
     
     for port_info in "${all_ports[@]}"; do
@@ -1312,6 +1457,9 @@ stop_services() {
         "$MACHINE_LEARNING_PORT:Machine Learning"
         "$ENTERPRISE_SECURITY_PORT:Enterprise Security"
         "$ADVANCED_ANALYTICS_PORT:Advanced Analytics"
+        "$TOOLCHAIN_INTEGRATION_PORT:Toolchain Integration"
+        "$AUTOPILOT_INTEGRATION_PORT:Autopilot Integration"
+        "$SPOTLIGHT_INTEGRATION_PORT:Spotlight Integration"
     )
     
     # Graceful shutdown of tracked processes first
@@ -1601,6 +1749,33 @@ check_status() {
         log_url "API: http://localhost:$ADVANCED_ANALYTICS_PORT"
     else
         log_warning "Advanced Analytics API: Not running"
+    fi
+    
+    # Check TSAI Ecosystem Integration Services
+    log_step "Checking TSAI Ecosystem Integration Services..."
+    
+    # Toolchain Integration
+    if is_port_in_use "$TOOLCHAIN_INTEGRATION_PORT"; then
+        log_success "Toolchain Integration API: Running"
+        log_url "API: http://localhost:$TOOLCHAIN_INTEGRATION_PORT"
+    else
+        log_warning "Toolchain Integration API: Not running"
+    fi
+    
+    # Autopilot Integration
+    if is_port_in_use "$AUTOPILOT_INTEGRATION_PORT"; then
+        log_success "Autopilot Integration API: Running"
+        log_url "API: http://localhost:$AUTOPILOT_INTEGRATION_PORT"
+    else
+        log_warning "Autopilot Integration API: Not running"
+    fi
+    
+    # Spotlight Integration
+    if is_port_in_use "$SPOTLIGHT_INTEGRATION_PORT"; then
+        log_success "Spotlight Integration API: Running"
+        log_url "API: http://localhost:$SPOTLIGHT_INTEGRATION_PORT"
+    else
+        log_warning "Spotlight Integration API: Not running"
     fi
     
     echo -e "${BRIGHT_GREEN}"

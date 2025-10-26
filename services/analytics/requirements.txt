@@ -1,0 +1,42 @@
+# Jarvis Analytics Service Dependencies
+
+# Core dependencies
+PyYAML==6.0.1
+requests==2.31.0
+
+# Prometheus
+prometheus-client==0.19.0
+
+# Grafana
+grafana-api==1.0.3
+
+# Data processing
+numpy==1.24.3
+pandas==2.1.4
+scipy==1.11.4
+
+# Visualization
+matplotlib==3.8.2
+seaborn==0.13.0
+plotly==5.17.0
+
+# Utilities
+python-dateutil==2.8.2
+pytz==2023.3
+uuid==1.30
+
+# Logging and monitoring
+structlog==23.2.0
+
+# Development and testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+black==23.9.1
+flake8==6.1.0
+mypy==1.6.1
+
+# Optional: For advanced features
+cryptography==41.0.7  # For encryption
+redis==5.0.1          # For caching
+celery==5.3.4         # For task queues

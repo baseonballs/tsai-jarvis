@@ -35,11 +35,20 @@ TSAI Jarvis has been assigned the **8000-8099** port range to avoid conflicts wi
 | **Advanced Analytics** | 8011 | http://localhost:8011 | Phase 2.7: Analytics API | ✅ **Active** |
 | **Image Analysis** | 8012 | http://localhost:8012 | Phase 2.8: Image Analysis API | ✅ **Active** |
 
+### TSAI Ecosystem Integration Services
+| Service | Port | URL | Description | Status |
+|---------|------|-----|-------------|--------|
+| **Toolchain Integration** | 8013 | http://localhost:8013 | Human-driven analytics workflows | ✅ **Active** |
+| **Autopilot Integration** | 8014 | http://localhost:8014 | Autonomous ML lifecycle management | ✅ **Active** |
+| **Spotlight Integration** | 8015 | http://localhost:8015 | Video processing and event detection | 🔄 **Planned** |
+| **Watson Integration** | 8016 | http://localhost:8016 | NLP reasoning and text analysis | 🔄 **Planned** |
+| **Holmes Integration** | 8017 | http://localhost:8017 | Media curation and asset management | 🔄 **Planned** |
+
 ### Reserved Ports
 | Port Range | Purpose | Status |
 |------------|---------|--------|
 | 8005-8006 | Future Phase 2.x services | 🔒 **Reserved** |
-| 8013-8099 | Future TSAI Jarvis services | 🔒 **Reserved** |
+| 8018-8099 | Future TSAI Jarvis services | 🔒 **Reserved** |
 
 ## TSAI Ecosystem Port Conflicts Analysis
 

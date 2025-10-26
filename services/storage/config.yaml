@@ -1,0 +1,74 @@
+# Jarvis Storage Service Configuration
+service:
+  name: "jarvis-storage-service"
+  type: "storage"
+  version: "1.0.0"
+  description: "Jarvis storage service for durable backend storage"
+
+# Storage Configuration
+storage:
+  type: "minio"
+  endpoint: "http://minio:9000"
+  access_key: "minioadmin"
+  secret_key: "minioadmin"
+  secure: false  # Set to true for HTTPS
+  
+  # Buckets
+  buckets:
+    - "jarvis-artifacts"
+    - "jarvis-models"
+    - "jarvis-datasets"
+    - "jarvis-logs"
+  
+  # Bucket Policies
+  bucket_policies:
+    jarvis-artifacts:
+      policy: "read-write"
+      retention: "30d"
+    jarvis-models:
+      policy: "read-write"
+      retention: "1y"
+    jarvis-datasets:
+      policy: "read-write"
+      retention: "6m"
+    jarvis-logs:
+      policy: "read-write"
+      retention: "7d"
+
+# Service Configuration
+service_config:
+  # Health Check
+  health_check:
+    enabled: true
+    interval: 30  # seconds
+    timeout: 10   # seconds
+  
+  # Logging
+  logging:
+    level: "INFO"
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    file: "/app/logs/storage-service.log"
+    max_size: "10MB"
+    backup_count: 5
+  
+  # Performance
+  performance:
+    max_connections: 100
+    connection_timeout: 30
+    read_timeout: 60
+    write_timeout: 60
+  
+  # Security
+  security:
+    encryption_at_rest: true
+    encryption_in_transit: true
+    access_logging: true
+    audit_logging: true
+
+# Environment Variables
+environment:
+  JARVIS_CONFIG_PATH: "/app/config/jarvis-core.yaml"
+  MINIO_ENDPOINT: "http://minio:9000"
+  MINIO_ACCESS_KEY: "minioadmin"
+  MINIO_SECRET_KEY: "minioadmin"
+  LOG_LEVEL: "INFO"
