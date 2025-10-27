@@ -15,7 +15,7 @@ fi
 
 # Activate virtual environment
 echo "Activating virtual environment..."
-source venv/bin/activate
+source .venv/bin/activate
 
 # Install requirements
 echo "Installing requirements..."

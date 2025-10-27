@@ -4,7 +4,7 @@
 # Video processing and event detection for hockey analytics
 
 # Source the virtual environment
-source venv/bin/activate
+source .venv/bin/activate
 
 # Define the API file and port
 API_FILE="hockey-analytics/spotlight_integration_api.py"

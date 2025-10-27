@@ -4,7 +4,7 @@
 # NLP reasoning and text analysis for hockey analytics
 
 # Source the virtual environment
-source venv/bin/activate
+source .venv/bin/activate
 
 # Define the API file and port
 API_FILE="hockey-analytics/watson_integration_api.py"

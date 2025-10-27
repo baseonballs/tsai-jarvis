@@ -642,7 +642,7 @@ start_core_api() {
     
     # Activate virtual environment
     log_step "Activating Python virtual environment..."
-    if ! source venv/bin/activate; then
+    if ! source .venv/bin/activate; then
         log_error "Failed to activate Python virtual environment"
         return 1
     fi
@@ -724,7 +724,7 @@ start_enterprise_integration() {
     cd "$PROJECT_ROOT"
     
     # Activate virtual environment
-    source venv/bin/activate
+    source .venv/bin/activate
     
     # Start Enterprise Integration API
     log_step "Starting Enterprise Integration API service..."
@@ -792,7 +792,7 @@ start_advanced_visualization() {
     cd "$PROJECT_ROOT"
     
     # Activate virtual environment
-    source venv/bin/activate
+    source .venv/bin/activate
     
     # Start Advanced Visualization API
     log_step "Starting Advanced Visualization API service..."
@@ -860,7 +860,7 @@ start_machine_learning() {
     cd "$PROJECT_ROOT"
     
     # Activate virtual environment
-    source venv/bin/activate
+    source .venv/bin/activate
     
     # Start Machine Learning API
     log_step "Starting Machine Learning API service..."
@@ -928,7 +928,7 @@ start_enterprise_security() {
     cd "$PROJECT_ROOT"
     
     # Activate virtual environment
-    source venv/bin/activate
+    source .venv/bin/activate
     
     # Start Enterprise Security API
     log_step "Starting Enterprise Security API service..."
@@ -996,7 +996,7 @@ start_advanced_analytics() {
     cd "$PROJECT_ROOT"
     
     # Activate virtual environment
-    source venv/bin/activate
+    source .venv/bin/activate
     
     # Start Advanced Analytics API
     log_step "Starting Advanced Analytics API service..."
@@ -1064,8 +1064,8 @@ start_toolchain_integration() {
     cd "$PROJECT_ROOT"
     
     # Activate virtual environment
-    if [[ -f "venv/bin/activate" ]]; then
-        source venv/bin/activate
+    if [[ -f ".venv/bin/activate" ]]; then
+        source .venv/bin/activate
     else
         log_error "Virtual environment not found"
         return 1
@@ -1108,8 +1108,8 @@ start_autopilot_integration() {
     cd "$PROJECT_ROOT"
     
     # Activate virtual environment
-    if [[ -f "venv/bin/activate" ]]; then
-        source venv/bin/activate
+    if [[ -f ".venv/bin/activate" ]]; then
+        source .venv/bin/activate
     else
         log_error "Virtual environment not found"
         return 1
@@ -1152,8 +1152,8 @@ start_spotlight_integration() {
     cd "$PROJECT_ROOT"
     
     # Activate virtual environment
-    if [[ -f "venv/bin/activate" ]]; then
-        source venv/bin/activate
+    if [[ -f ".venv/bin/activate" ]]; then
+        source .venv/bin/activate
     else
         log_error "Virtual environment not found"
         return 1

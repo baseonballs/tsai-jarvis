@@ -4,7 +4,7 @@
 # Media curation and asset management for hockey analytics
 
 # Source the virtual environment
-source venv/bin/activate
+source .venv/bin/activate
 
 # Define the API file and port
 API_FILE="hockey-analytics/holmes_integration_api.py"

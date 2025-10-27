@@ -4,7 +4,7 @@
 # Human-driven hockey analytics and AI detection workflows
 
 # Source the virtual environment
-source venv/bin/activate
+source .venv/bin/activate
 
 # Define the API file and port
 API_FILE="hockey-analytics/toolchain_integration_api.py"

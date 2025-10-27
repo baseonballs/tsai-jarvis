@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Source the virtual environment
-source venv/bin/activate
+source .venv/bin/activate
 
 # Define the API file and port
 API_FILE="hockey-analytics/image_analysis_api.py"

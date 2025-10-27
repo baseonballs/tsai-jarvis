@@ -4,7 +4,7 @@
 # Inter-service communication and orchestration for TSAI ecosystem
 
 # Source the virtual environment
-source venv/bin/activate
+source .venv/bin/activate
 
 # Define the API file and port
 API_FILE="hockey-analytics/service_mesh_api.py"

@@ -4,7 +4,7 @@
 # Autonomous ML lifecycle and model management for hockey analytics
 
 # Source the virtual environment
-source venv/bin/activate
+source .venv/bin/activate
 
 # Define the API file and port
 API_FILE="hockey-analytics/autopilot_integration_api.py"
